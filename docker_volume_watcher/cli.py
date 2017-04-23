@@ -3,6 +3,7 @@
 import argparse
 import logging
 
+import pywintypes
 from docker_volume_watcher.container_monitor import ContainerMonitor
 
 def main():
@@ -24,11 +25,14 @@ def main():
         logging.basicConfig(level=logging.INFO)
 
     monitor = ContainerMonitor(args.container_pattern, args.host_dir_pattern)
-    monitor.find_containers()
     try:
+        monitor.find_containers()
         monitor.monitor()
     except KeyboardInterrupt:
         logging.info('Got KeyboardInterrupt. Exiting...')
+    except pywintypes.error:
+        logging.error('Failed to contact Docker daemon. Is it running?')
+
     monitor.unwatch_all()
 
 if __name__ == "__main__":
