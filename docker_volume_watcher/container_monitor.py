@@ -3,6 +3,7 @@ Exports ContainerMonitor to monitor container start/stop events and spawn notifi
 """
 
 import logging
+import os
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
@@ -102,6 +103,11 @@ class ContainerMonitor(object):
                     container_name, mount['Source'])
                 continue
             if not fnmatch(host_directory, self.host_dir_pattern):
+                continue
+            if not os.path.isdir(host_directory):
+                logging.warning(
+                    'Bind of container %s was skipped for path %s as it\'s not a directory',
+                    container_name, mount['Source'])
                 continue
             notifier = ContainerNotifier(container, host_directory, mount['Destination'])
             notifiers.append(notifier)
