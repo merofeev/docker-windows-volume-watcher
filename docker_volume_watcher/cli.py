@@ -36,7 +36,7 @@ def main():
     except KeyboardInterrupt:
         logging.info('Got KeyboardInterrupt. Exiting...')
     except pywintypes.error:
-        logging.error('Failed to contact Docker daemon. Is it running?')
+        logging.error('Failed to contact Docker daemon. Is it running?', exc_info=True)
 
     monitor.unwatch_all()
 

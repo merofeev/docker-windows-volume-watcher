@@ -69,10 +69,10 @@ class ContainerNotifier(object):
                 ['chmod', permissions, absolute_path],
                 privileged=True)
         except docker.errors.APIError:
-            logging.warning(
+            logging.error(
                 'Failed to notify container %s about change in %s',
                 self.container.name,
-                absolute_path)
+                absolute_path, exc_info=True)
 
     def stop(self):
         """
