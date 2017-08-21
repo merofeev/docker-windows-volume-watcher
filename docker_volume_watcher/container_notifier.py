@@ -61,13 +61,11 @@ class ContainerNotifier(object):
             self.container.name,
             absolute_path)
         try:
-            permissions = self.container.exec_run(
-                ['stat', '-c', '%a', absolute_path],
-                privileged=True)
+            permissions = self.container.exec_run(['stat', '-c', '%a', absolute_path], privileged=True)
             permissions = permissions.decode('utf-8').strip()
-            self.container.exec_run(
-                ['chmod', permissions, absolute_path],
-                privileged=True)
+            response = self.container.exec_run(['chmod', permissions, absolute_path], privileged=True)
+            if response:
+                logging.info(str(response))
         except docker.errors.APIError:
             logging.error(
                 'Failed to notify container %s about change in %s',
