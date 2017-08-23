@@ -1,6 +1,9 @@
-'''Exports ContainerMonitor to monitor container start/stop events and spawn notifiers.'''
+"""
+Exports ContainerMonitor to monitor container start/stop events and spawn notifiers.
+"""
 
 import logging
+import os
 import re
 from datetime import datetime, timedelta
 from fnmatch import fnmatch
@@ -9,8 +12,18 @@ import docker
 
 from docker_volume_watcher.container_notifier import ContainerNotifier
 
+
 def docker_bind_to_windows_path(path):
-    '''Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).'''
+    """
+    Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
+
+    Args:
+        path (str): Hyper-V mount path
+
+    Returns:
+        str:  Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
+
+    """
     expr = re.compile('^/([a-zA-Z])/(.*)$')
     match = re.match(expr, path)
     if not match:
@@ -19,9 +32,17 @@ def docker_bind_to_windows_path(path):
 
 
 class ContainerMonitor(object):
-    '''Monitors container start/stop events and creates notifiers for mounts matching patterns.'''
-
+    """
+    Monitors container start/stop events and creates notifiers for mounts matching patterns.
+    """
     def __init__(self, container_name_pattern, host_dir_pattern):
+        """
+        Initialize new instance of ContainerMonitor
+
+        Args:
+            container_name_pattern (str): Container name pattern
+            host_dir_pattern (str): Host directory pattern
+        """
         self.client = docker.from_env()
         self.container_name_pattern = container_name_pattern
         self.host_dir_pattern = host_dir_pattern
@@ -40,28 +61,31 @@ class ContainerMonitor(object):
             self.unwatch_container(container_name)
 
     def find_containers(self):
-        '''Traverse running containers and spawn notifiers for mounts mattching patterns.'''
-
+        """
+        Traverse running containers and spawn notifiers for mounts matching patterns.
+        """
         notifiers_count = 0
         for container in self.client.containers.list():
             if fnmatch(container.name, self.container_name_pattern):
                 notifiers = self.watch_container(container.name)
+                logging.info('Container %s has %i watched directories', container.name, len(notifiers))
                 notifiers_count += len(notifiers)
 
-        if notifiers_count == 0:
+        if not notifiers_count:
             logging.warning(
                 'No mounts match container name pattern %s and host directory pattern %s',
                 self.container_name_pattern, self.host_dir_pattern)
 
     def watch_container(self, container_name):
-        '''Create notifiers for mounts of container_name matching host_dir_pattern.
+        """
+        Create notifiers for mounts of container_name matching host_dir_pattern.
 
         Args:
-            container_name (str): name of container.
+            container_name (str): Container name
 
         Returns:
-            List of spawned ContainerNotifier-s.
-        '''
+            list of :py:class:`ContainerNotifier`: List of spawned ContainerNotifier instances.
+        """
 
         container = self.client.containers.get(container_name)
         mounts = container.attrs['Mounts']
@@ -80,13 +104,23 @@ class ContainerMonitor(object):
                 continue
             if not fnmatch(host_directory, self.host_dir_pattern):
                 continue
+            if not os.path.isdir(host_directory):
+                logging.warning(
+                    'Bind of container %s was skipped for path %s as it\'s not a directory',
+                    container_name, mount['Source'])
+                continue
             notifier = ContainerNotifier(container, host_directory, mount['Destination'])
             notifiers.append(notifier)
             logging.info('Notifier %s created.', notifier)
         return notifiers
 
     def unwatch_container(self, container_name):
-        '''Destroy all notifiers of container_name.'''
+        """
+        Destroy all notifiers of container_name.
+
+        Args:
+            container_name (str): Container name
+        """
 
         if container_name not in self.notifiers:
             return
@@ -96,14 +130,18 @@ class ContainerMonitor(object):
         del self.notifiers[container_name]
 
     def unwatch_all(self):
-        '''Destroy all notifiers.'''
+        """
+        Destroy all notifiers.
+        """
 
         containers = list(self.notifiers)
         for name in containers:
             self.unwatch_container(name)
 
     def monitor(self):
-        '''Start listening and handling of container start/stop events.'''
+        """
+        Start listening and handling of container start/stop events.
+        """
 
         delta = timedelta(seconds=2)
         since = datetime.utcnow()

@@ -1,4 +1,6 @@
-'''A tool to notify Docker contianers about changes in mounts on Windows.'''
+"""
+A tool to notify Docker contianers about changes in mounts on Windows.
+"""
 
 import argparse
 import logging
@@ -6,8 +8,11 @@ import logging
 import pywintypes
 from docker_volume_watcher.container_monitor import ContainerMonitor
 
+
 def main():
-    '''Parse command line arguments and start monitoring.'''
+    """
+    Parse command line arguments and start monitoring.
+    """
 
     parser = argparse.ArgumentParser(
         description='A tool to notify Docker contianers about changes in mounts on Windows.'
@@ -31,7 +36,7 @@ def main():
     except KeyboardInterrupt:
         logging.info('Got KeyboardInterrupt. Exiting...')
     except pywintypes.error:
-        logging.error('Failed to contact Docker daemon. Is it running?')
+        logging.error('Failed to contact Docker daemon. Is it running?', exc_info=True)
 
     monitor.unwatch_all()
 
