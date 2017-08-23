@@ -68,7 +68,8 @@ class ContainerMonitor(object):
         for container in self.client.containers.list():
             if fnmatch(container.name, self.container_name_pattern):
                 notifiers = self.watch_container(container.name)
-                logging.info('Container %s has %i watched directories', container.name, len(notifiers))
+                logging.info(
+                    'Container %s has %i watched directories', container.name, len(notifiers))
                 notifiers_count += len(notifiers)
 
         if not notifiers_count:
