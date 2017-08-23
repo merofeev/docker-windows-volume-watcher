@@ -1,7 +1,10 @@
 from setuptools import setup, find_packages
 
+with open('README.rst') as file:
+    long_description = file.read()
+
 setup(name='docker-windows-volume-watcher',
-      version='1.0.3',
+      version='1.0.4',
       packages=find_packages(),
       entry_points={
           'console_scripts': ['docker-volume-watcher=docker_volume_watcher.cli:main'],
@@ -16,6 +19,7 @@ setup(name='docker-windows-volume-watcher',
         'pypiwin32>=219; platform_system=="Windows"'
         ],
       license='MIT',
+      long_description=long_description,
       keywords='Docker volume Windows watch inotify',
       classifiers=[
         'Intended Audience :: Developers',
