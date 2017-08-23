@@ -4,9 +4,9 @@ Exports ContainerNotifier enabling to notify containers about file changes in mo
 
 import logging
 from os.path import relpath
+import posixpath
 
 import docker
-import posixpath
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
