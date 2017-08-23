@@ -1,6 +1,14 @@
 language: python
 python:
-  - "2.7"
-  - "3.6"
-install: "pip install ./ pylint"
+- '2.7'
+- '3.6'
+install: pip install ./ pylint
 script: pylint docker_volume_watcher
+deploy:
+  provider: pypi
+  user: merofeev
+  password:
+    secure: jOp0Wu4RzlGkKl8noD4YQDQkPSlm/emkttHUJ9Qe8hDIrcnHfnzDKkEJ+7djwXgXLBXiXhCWriXmoG0QSwMvqmQlbx0FkXMgBG4+4iSGKboPhFV1iwfThQcNsPuCo1v0TSnpHCahijKgPb50u7TeVN3BYl20ITSV57TdQG7kw9vaC6IyWR+drdeY2vIDkS5HDlVzO7JLgYufr6Rw6yWLPkrFhtolaQphwSKGI4FFvgm3bbt+E6uGXJniQqwv6+i2Yi5x1yRihNDavklGk2s1j7uAOqT2WTO+c+qpGtvNRKOhWjp9ucP80mT+ETXl2XzqL/y1dbWIbAEivb0xH98e6cDapFpFKKuqGUzsp8vTOFq79dXyJv1F/HXyhpdmZGTHVl/sJvzTBw6JfQ0fcrc4OHRQuP2ohrlyongCLCLK7BowSitAATFOfzD586aPGO/EiSNnw4Qg1GrXShBhq6uGjE6iBezTFDfZKxqLzSYCF1IgaUjlIJYylv4/oE34nSCQCtJxH9jzzTran6X1ufcr7Xmq9iSxmEdt3B6dv5dPz2g5+8pX1t7Uy4Pah5XH0BM8hVPNynpDDzJYy3aiieeJIrEwzwRYg725lokNDLsiePvO4E6x6UmicHHvjgazAld9lEV4DuAN9H92/GEZVFPUtpNrNb0bm59uM88DRSY5kko=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
