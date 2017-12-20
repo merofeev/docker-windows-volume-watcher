@@ -24,7 +24,7 @@ def docker_bind_to_windows_path(path):
         str:  Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
 
     """
-    expr = re.compile('^/([a-zA-Z])/(.*)$')
+    expr = re.compile('^(?:/host_mnt)?/([a-zA-Z])/(.*)$')
     match = re.match(expr, path)
     if not match:
         return None
