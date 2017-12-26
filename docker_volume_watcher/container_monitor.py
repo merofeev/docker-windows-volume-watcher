@@ -51,13 +51,12 @@ class ContainerMonitor(object):
     def __handle_event(self, event):
         container_name = event['Actor']['Attributes']['name']
         status = event['status']
-
         if not fnmatch(container_name, self.container_name_pattern):
             return
 
         if status == 'start':
             self.watch_container(container_name)
-        elif status == 'stop':
+        elif status == 'die':
             self.unwatch_container(container_name)
 
     def find_containers(self):
@@ -147,7 +146,7 @@ class ContainerMonitor(object):
         delta = timedelta(seconds=2)
         since = datetime.utcnow()
         until = datetime.utcnow() + delta
-        filters = {'event': ['start', 'stop'], 'type': 'container'}
+        filters = {'event': ['start', 'die'], 'type': 'container'}
         while True:
             for event in self.client.events(since=since, until=until, decode=True, filters=filters):
                 self.__handle_event(event)
