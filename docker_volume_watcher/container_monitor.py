@@ -15,7 +15,7 @@ from docker_volume_watcher.container_notifier import ContainerNotifier
 
 def docker_bind_to_windows_path(path):
     """
-    Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
+    Converts Hyper-V mount path to Windows path (e.g. [/host_mnt]/C/some-path -> C:/some-path).
 
     Args:
         path (str): Hyper-V mount path
