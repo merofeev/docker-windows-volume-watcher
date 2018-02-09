@@ -10,6 +10,9 @@ import docker
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+class NonZeroExitError(RuntimeError):
+    def __init__(self,exit_code):
+        self.exit_code = exit_code
 
 class ContainerNotifier(object):
     """
@@ -62,17 +65,25 @@ class ContainerNotifier(object):
             absolute_path)
         try:
             permissions = self.container.exec_run(
-                ['stat', '-c', '%a', absolute_path], privileged=True)
-            permissions = permissions.decode('utf-8').strip()
+                ['stat', '-c', '%a', absolute_path], privileged=True)   
+            if permissions.exit_code != 0:
+                raise NonZeroExitError(permissions.exit_code)
+            permissions = permissions.output.decode('utf-8').strip()
             response = self.container.exec_run(
                 ['chmod', permissions, absolute_path], privileged=True)
+            if response.exit_code != 0:
+                raise NonZeroExitError(response.exit_code)
             if response:
-                logging.info(str(response))
+                logging.info(response.output.decode('utf-8').strip())
         except docker.errors.APIError:
             logging.error(
                 'Failed to notify container %s about change in %s',
                 self.container.name,
                 absolute_path, exc_info=True)
+        except NonZeroExitError as e:
+            logging.error(
+                'Exec run returned non-zero exit code: %s',
+                e.exit_code)
 
     def stop(self):
         """
