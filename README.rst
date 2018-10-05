@@ -43,6 +43,11 @@ You can also specify wildcards with ``*`` and ``?`` characters. For example: mon
 
     docker-volume-watcher *myproject* C:\project\folder\*
 
+Do not monitor files/directories matching ``*.git*`` and ``*build*`` patterns:
+
+.. code:: bat
+
+    docker-volume-watcher -e "*.git*" "*build*"
 
 Use flag ``-v`` to enable verbose output: the script will report start/stop events of eligible containers and print all detected file changes.
 

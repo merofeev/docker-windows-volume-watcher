@@ -24,12 +24,17 @@ def main():
 
     parser.add_argument("-v", "--verbose", help="increase output verbosity",
                         action="store_true")
+    parser.add_argument('-e', '--exclude',
+                        help='ignore changes in files/directories matching given patterns',
+                        nargs='+')
+
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
 
-    monitor = ContainerMonitor(args.container_pattern, args.host_dir_pattern)
+    monitor = ContainerMonitor(args.container_pattern, args.host_dir_pattern,
+                               exclude_patterns=args.exclude)
     try:
         monitor.find_containers()
         monitor.monitor()

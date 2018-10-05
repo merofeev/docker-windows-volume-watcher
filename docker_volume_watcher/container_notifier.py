@@ -24,7 +24,7 @@ class ContainerNotifier(object):
     Notifies container about file changes in binded host-directory.
     """
 
-    def __init__(self, container, host_dir, container_dir):
+    def __init__(self, container, host_dir, container_dir, exclude_patterns=None):
         """
         Initialize a new instance of ContainerNotifier
 
@@ -32,12 +32,16 @@ class ContainerNotifier(object):
             container: Container
             host_dir (str): Host directory
             container_dir (str): Container directory
+            exclude_patterns (list): List of file name patterns for which changes should be ignored
         """
         self.container = container
         self.host_dir = host_dir
         self.container_dir = container_dir
+        exclude_patterns = exclude_patterns if exclude_patterns else []
 
-        event_handler = PatternMatchingEventHandler(ignore_directories=False)
+        event_handler = PatternMatchingEventHandler(
+            ignore_patterns=exclude_patterns, ignore_directories=False)
+
         handler = self.__change_handler
         event_handler.on_created = handler
         event_handler.on_moved = handler
