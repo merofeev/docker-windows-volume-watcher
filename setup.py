@@ -4,7 +4,7 @@ with open('README.rst') as file:
     long_description = file.read()
 
 setup(name='docker-windows-volume-watcher',
-      version='1.0.8',
+      version='1.1.0',
       packages=find_packages(),
       entry_points={
           'console_scripts': ['docker-volume-watcher=docker_volume_watcher.cli:main'],
