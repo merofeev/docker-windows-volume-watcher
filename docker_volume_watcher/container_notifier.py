@@ -30,6 +30,9 @@ def debounce(bounce_delay):
         old_time = {'value' : None}
 
         def wrapped(*args, **kwargs):
+            """
+            internal function
+            """
             new_time = time.time()
             if old_time['value'] is None or new_time - old_time['value'] >= bounce_delay:
                 result = my_function(*args, **kwargs)
