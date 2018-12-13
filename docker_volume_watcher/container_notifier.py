@@ -10,6 +10,25 @@ import docker
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+import time
+
+
+def debounce(s):
+    """Decorator ensures function that can only be called once every `s` seconds.
+    """
+    def decorate(f):
+        t = None
+
+        def wrapped(*args, **kwargs):
+            nonlocal t
+            t_ = time.time()
+            if t is None or t_ - t >= s:
+                result = f(*args, **kwargs)
+                t = time.time()
+                return result
+        return wrapped
+    return decorate
+
 class NonZeroExitError(RuntimeError):
     """
     A non-zero exit code error from the command execution in docker.
@@ -54,6 +73,10 @@ class ContainerNotifier(object):
     def __str__(self):
         return '%s -> %s:%s' % (self.host_dir, self.container.name, self.container_dir)
 
+    # debounce avoid two subsequents save to ooccur
+    # limitation, if several files are saved the same time
+    # some files could be skipped
+    @debounce(2)
     def __change_handler(self, event):
         host_path = event.dest_path if hasattr(event, 'dest_path') else event.src_path
         relative_host_path = relpath(host_path, self.host_dir).replace('\\', '/')
