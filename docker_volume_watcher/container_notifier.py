@@ -5,19 +5,29 @@ Exports ContainerNotifier enabling to notify containers about file changes in mo
 import logging
 from os.path import relpath
 import posixpath
+import time
 
 import docker
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
-import time
-
-
 def debounce(bounce_delay):
-    """Decorator ensures function that can only be called once every `s` seconds.
     """
+    define debounce method annotation
+
+    Args:
+        bounce_delay (int): the minimum delay in seconds between two function calls
+    """
+
     def decorate(my_function):
-        old_time = {'value' : None }
+        """
+        Decorator ensures function that can only be called once every `bounce_delay` seconds.
+
+        Args:
+            my_function (function): the function to debounce
+        """
+
+        old_time = {'value' : None}
 
         def wrapped(*args, **kwargs):
             new_time = time.time()
