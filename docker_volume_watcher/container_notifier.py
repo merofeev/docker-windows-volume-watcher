@@ -13,19 +13,19 @@ from watchdog.events import PatternMatchingEventHandler
 import time
 
 
-def debounce(s):
+def debounce(bounce_delay):
     """Decorator ensures function that can only be called once every `s` seconds.
     """
-    def decorate(f):
-        t = None
+    def decorate(my_function):
+        old_time = {'value' : None }
 
         def wrapped(*args, **kwargs):
-            nonlocal t
-            t_ = time.time()
-            if t is None or t_ - t >= s:
-                result = f(*args, **kwargs)
-                t = time.time()
+            new_time = time.time()
+            if old_time['value'] is None or new_time - old_time['value'] >= bounce_delay:
+                result = my_function(*args, **kwargs)
+                old_time['value'] = time.time()
                 return result
+            return None
         return wrapped
     return decorate
 
