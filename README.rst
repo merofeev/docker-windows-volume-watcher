@@ -49,7 +49,15 @@ Do not monitor files/directories matching ``*.git*`` and ``*build*`` patterns:
 
     docker-volume-watcher -e "*.git*" "*build*"
 
+If you experience duplicate notification issue (e.g. `Duplicate notification - a single change triggers 2 notifications to the container`_), try event debounce feature:
+
+.. code:: bat
+
+    docker-volume-watcher --debounce 0.1
+
 Use flag ``-v`` to enable verbose output: the script will report start/stop events of eligible containers and print all detected file changes.
+
+.. _Duplicate notification - a single change triggers 2 notifications to the container: https://github.com/merofeev/docker-windows-volume-watcher/issues/13
 
 Limitations
 ------------
