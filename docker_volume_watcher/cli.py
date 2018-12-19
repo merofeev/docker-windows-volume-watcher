@@ -7,7 +7,7 @@ import logging
 
 import pywintypes
 from docker_volume_watcher.container_monitor import ContainerMonitor
-
+from docker_volume_watcher.container_notifier import NotifierOptions
 
 def main():
     """
@@ -27,14 +27,19 @@ def main():
     parser.add_argument('-e', '--exclude',
                         help='ignore changes in files/directories matching given patterns',
                         nargs='+')
+    parser.add_argument('--debounce', type=float, default=0.0,
+                        help='delay container notification after change occurs by DEBOUNCE '
+                             'seconds ang ignore change events in the same file during '
+                             'this period')
 
     args = parser.parse_args()
 
     if args.verbose:
         logging.basicConfig(level=logging.INFO)
 
-    monitor = ContainerMonitor(args.container_pattern, args.host_dir_pattern,
-                               exclude_patterns=args.exclude)
+    notifier_options = NotifierOptions(args.exclude, args.debounce)
+    monitor = ContainerMonitor(args.container_pattern, args.host_dir_pattern, notifier_options)
+
     try:
         monitor.find_containers()
         monitor.monitor()

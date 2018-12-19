@@ -35,7 +35,7 @@ class ContainerMonitor(object):
     """
     Monitors container start/stop events and creates notifiers for mounts matching patterns.
     """
-    def __init__(self, container_name_pattern, host_dir_pattern, exclude_patterns=None):
+    def __init__(self, container_name_pattern, host_dir_pattern, notifier_options=None):
         """
         Initialize new instance of ContainerMonitor
 
@@ -43,12 +43,14 @@ class ContainerMonitor(object):
             container_name_pattern (str): Container name pattern
             host_dir_pattern (str): Host directory pattern
             exclude_patterns (list): List of file name patterns for which changes should be ignored
+            notifier_options (NotifierOptions): options to be passed to each instance
+                of ContainerNotifier
         """
         self.client = docker.from_env()
         self.container_name_pattern = container_name_pattern
         self.host_dir_pattern = host_dir_pattern
         self.notifiers = {}
-        self.exclude_patterns = exclude_patterns if exclude_patterns else []
+        self.notifier_options = notifier_options
 
     def __handle_event(self, event):
         container_name = event['Actor']['Attributes']['name']
@@ -112,7 +114,7 @@ class ContainerMonitor(object):
                     container_name, mount['Source'])
                 continue
             notifier = ContainerNotifier(
-                container, host_directory, mount['Destination'], self.exclude_patterns)
+                container, host_directory, mount['Destination'], self.notifier_options)
             notifiers.append(notifier)
             logging.info('Notifier %s created.', notifier)
         return notifiers

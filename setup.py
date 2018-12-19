@@ -16,7 +16,7 @@ setup(name='docker-windows-volume-watcher',
       install_requires=[
         'watchdog>=0.8.3',
         'docker>=3.0.0',
-        'pypiwin32>=219; platform_system=="Windows"'
+        'future>=0.17.1',
         ],
       license='MIT',
       long_description=long_description,

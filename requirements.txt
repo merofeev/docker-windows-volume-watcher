@@ -1,3 +1,4 @@
 watchdog>=0.8.3
 docker>=3.0.0
 pypiwin32>=219
+future>=0.17.1
