@@ -5,6 +5,7 @@ Exports ContainerNotifier enabling to notify containers about file changes in mo
 import logging
 from os.path import relpath
 import posixpath
+from fnmatch import fnmatch
 
 import docker
 from watchdog.observers import Observer
@@ -59,19 +60,20 @@ class ContainerNotifier(object):
         self.container = container
         self.host_dir = host_dir
         self.container_dir = container_dir
-        options = NotifierOptions() if options is None else options
+        self.options = NotifierOptions() if options is None else options
 
         event_handler = PatternMatchingEventHandler(
-            ignore_patterns=options.exclude_patterns, ignore_directories=False)
+            ignore_patterns=self.options.exclude_patterns, ignore_directories=False)
 
         handler = self.__change_handler
         event_handler.on_created = handler
         event_handler.on_moved = handler
         event_handler.on_modified = handler
 
-        if options.notify_debounce:
-            logging.info('File change events debouncing with %fs delay.', options.notify_debounce)
-            self.notify_debounced = CallDebouncer(self.notify, options.notify_debounce)
+        if self.options.notify_debounce:
+            logging.info(
+                'File change events debouncing with %fs delay.', self.options.notify_debounce)
+            self.notify_debounced = CallDebouncer(self.notify, self.options.notify_debounce)
         else:
             self.notify_debounced = self.notify
 
@@ -84,6 +86,14 @@ class ContainerNotifier(object):
 
     def __change_handler(self, event):
         host_path = event.dest_path if hasattr(event, 'dest_path') else event.src_path
+
+        # PatternMatchingEventHandler filters events according to src_path.
+        # We create extra filtration by dest_path.
+        if any(fnmatch(host_path, exlude) for exlude in self.options.exclude_patterns):
+            logging.info(
+                'Ignoring event in %s since it matches one of exclude_patterns.', host_path)
+            return
+
         relative_host_path = relpath(host_path, self.host_dir).replace('\\', '/')
         absolute_path = posixpath.join(self.container_dir, relative_host_path)
         self.notify_debounced(absolute_path)
