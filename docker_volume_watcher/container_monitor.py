@@ -15,7 +15,11 @@ from docker_volume_watcher.container_notifier import ContainerNotifier
 
 def docker_bind_to_windows_path(path):
     """
-    Converts Hyper-V mount path to Windows path (e.g. [/host_mnt]/C/some-path -> C:/some-path).
+    Converts Hyper-V mount path to Windows path (e.g.
+        [/host_mnt]/C/some-path -> C:/some-path
+        [/run/desktop/mnt/host]/C/some-path -> C:/some-path
+        C:\\some-path -> C:\\some-path
+    ).
 
     Args:
         path (str): Hyper-V mount path
@@ -24,8 +28,8 @@ def docker_bind_to_windows_path(path):
         str:  Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
 
     """
-    expr = re.compile('^(?:/host_mnt)?/([a-zA-Z])/(.*)$')
-    match = re.match(expr, path)
+    expr = re.compile(r'^(?:/host_mnt/|/run/desktop/mnt/host/)?([a-zA-Z]):?[/\\](.*)$')
+    match = expr.match(path)
     if not match:
         return None
     return '%s:\\%s' % match.groups()
@@ -42,7 +46,6 @@ class ContainerMonitor(object):
         Args:
             container_name_pattern (str): Container name pattern
             host_dir_pattern (str): Host directory pattern
-            exclude_patterns (list): List of file name patterns for which changes should be ignored
             notifier_options (NotifierOptions): options to be passed to each instance
                 of ContainerNotifier
         """

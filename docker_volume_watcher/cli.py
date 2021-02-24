@@ -1,5 +1,5 @@
 """
-A tool to notify Docker contianers about changes in mounts on Windows.
+A tool to notify Docker containers about changes in mounts on Windows.
 """
 
 import argparse
@@ -15,7 +15,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser(
-        description='A tool to notify Docker contianers about changes in mounts on Windows.'
+        description='A tool to notify Docker containers about changes in mounts on Windows.'
     )
     parser.add_argument('container_pattern', metavar='CONTAINER_PATTERN', type=str, default='*',
                         nargs='?', help='pattern of container names to be notified (default: *)')
@@ -49,6 +49,7 @@ def main():
         logging.error('Failed to contact Docker daemon. Is it running?', exc_info=True)
 
     monitor.unwatch_all()
+
 
 if __name__ == "__main__":
     main()

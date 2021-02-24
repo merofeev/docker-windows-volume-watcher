@@ -49,7 +49,6 @@ class CallDebouncer(object):
         self._worker.setDaemon(True)
         self._worker.start()
 
-
     def __call__(self, *args, **kwargs):
         self._calls.put((time.time(), CallArgs(*args, **kwargs)))
 
@@ -74,7 +73,7 @@ class CallDebouncer(object):
 
     def _remove_outdated(self, submit_time):
         while self._call_times:
-            cache_key, cache_time = next(iter(self._call_times.items())) # Pick first item
+            cache_key, cache_time = next(iter(self._call_times.items()))  # Pick first item
             if submit_time < cache_time:
                 break
             self._call_times.pop(cache_key)
