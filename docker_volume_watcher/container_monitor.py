@@ -16,6 +16,7 @@ from docker_volume_watcher.container_notifier import ContainerNotifier
 def docker_bind_to_windows_path(path):
     """
     Converts Hyper-V mount path to Windows path (e.g. [/host_mnt]/C/some-path -> C:/some-path).
+    (For new version docker e.g. [/run/desktop/mnt/host]/C/some-path -> C:/some-path)
 
     Args:
         path (str): Hyper-V mount path
@@ -24,7 +25,7 @@ def docker_bind_to_windows_path(path):
         str:  Converts Hyper-V mount path to Windows path (e.g. /C/some-path -> C:/some-path).
 
     """
-    expr = re.compile('^(?:/host_mnt)?/([a-zA-Z])/(.*)$')
+    expr = re.compile('^(?:/host_mnt|/run/desktop/mnt/host)?/([a-zA-Z])/(.*)$')
     match = re.match(expr, path)
     if not match:
         return None
